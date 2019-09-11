@@ -4,11 +4,12 @@ from ann_benchmarks.algorithms.base import BaseANN
 
 
 class PyNNDescent(BaseANN):
-    def __init__(self, metric, n_neighbors=10, n_trees=8, leaf_size=20):
+    def __init__(self, metric, n_neighbors=10, n_trees=8, leaf_size=20, n_jobs=-1):
         self._n_neighbors = int(n_neighbors)
         self._n_trees = int(n_trees)
         self._leaf_size = int(leaf_size)
         self._queue_size = None
+        self._n_jobs = n_jobs
         self._pynnd_metric = {'angular': 'cosine',
                               'euclidean': 'euclidean',
                               'hamming': 'hamming',
@@ -19,7 +20,9 @@ class PyNNDescent(BaseANN):
                                             n_neighbors=self._n_neighbors,
                                             n_trees=self._n_trees,
                                             leaf_size=self._leaf_size,
-                                            metric=self._pynnd_metric)
+                                            metric=self._pynnd_metric,
+                                            low_memory=True,
+                                            n_jobs=self._n_jobs)
 
     def set_query_arguments(self, queue_size):
         self._queue_size = float(queue_size)
