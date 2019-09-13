@@ -53,7 +53,7 @@ def store_results(dataset, count, definition, query_arguments, attrs, results,
 
 def load_all_results(dataset=None, count=None, split_batched=False,
                      batch_mode=False):
-    for root, _, files in os.walk(get_result_filename(dataset, count)):
+    for root, _, files in os.walk(get_result_filename(dataset, count), followlinks=True):
         for fn in files:
             try:
                 if split_batched and batch_mode != is_batch(root):
