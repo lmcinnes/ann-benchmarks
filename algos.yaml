@@ -267,8 +267,8 @@ float:
       base-args: ["@metric"]
       run-groups:
         pynndescent:
-          args: [[5, 10, 20, 40, 80, 120]]
-          query-args: [[1.0, 1.5, 2.0, 5.0, 10.0, 15.0]]
+          args: [[10, 20, 40, 80], [1.6, 2.0], [0.0, 0.66]]
+          query-args: [[1.0, 1.5], [0.0, 0.02, 0.04, 0.08, 0.16, 0.24]]
     NGT-panng:
       docker-tag: ann-benchmarks-ngt
       module: ann_benchmarks.algorithms.panng_ngt
@@ -381,8 +381,9 @@ float:
       base-args: ["@metric"]
       run-groups:
         pynndescent:
-          args: [[5, 10, 16, 24, 40, 64, 96, 120]]
-          query-args: [[1.0, 1.5, 2.0, 5.0, 10.0, 15.0]]
+          args: [[10, 20, 40], [1.6, 2.0], [0.0, 0.66]]
+          query-args: [[1.0], [0.0, 0.02, 0.04, 0.08, 0.16, 0.24]]
+
   angular:
     puffinn:
       docker-tag: ann-benchmarks-puffinn
@@ -470,8 +471,8 @@ float:
       base-args: ["@metric"]
       run-groups:
         pynndescent:
-          args: [[5, 10, 20, 40, 80, 160, 320]]
-          query-args: [[1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0]]
+          args: [[20, 40, 80, 120], [1.6, 2.0], [0.0, 0.66]]
+          query-args: [[1.0, 1.5], [0.0, 0.8, 0.16, 0.24, 0.32]]
 bit:
   hamming:
     mih:
@@ -530,8 +531,8 @@ bit:
       base-args: ["euclidean"]
       run-groups:
         pynndescent:
-          args: [[20, 40, 80, 160, 250], [4], [40]]
-          query-args: [[1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0]]
+          args: [[20, 40, 80, 120, 160], [1.6, 2.0], [0.0, 0.66]]
+          query-args: [[1.0, 1.5], [0.0, 0.08, 0.16, 0.24, 0.32]]
     annoy:
       docker-tag: ann-benchmarks-annoy
       module: ann_benchmarks.algorithms.annoy
