@@ -268,7 +268,7 @@ float:
       run-groups:
         pynndescent:
           args: [[10, 20, 40, 80], [1.6, 2.0], [0.0, 0.66]]
-          query-args: [[1.0, 1.5], [0.0, 0.02, 0.04, 0.08, 0.16, 0.24]]
+          query-args: [[1.0, 1.2, 1.5], [0.0, 0.02, 0.04, 0.08, 0.16, 0.24]]
     NGT-panng:
       docker-tag: ann-benchmarks-ngt
       module: ann_benchmarks.algorithms.panng_ngt
@@ -382,7 +382,7 @@ float:
       run-groups:
         pynndescent:
           args: [[10, 20, 40], [1.6, 2.0], [0.0, 0.66]]
-          query-args: [[1.0], [0.0, 0.02, 0.04, 0.08, 0.16, 0.24]]
+          query-args: [[1.0, 1.2, 1.5], [0.0, 0.02, 0.04, 0.08, 0.16, 0.24]]
 
   angular:
     puffinn:
