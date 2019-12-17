@@ -109,11 +109,11 @@ algorithm_classes = {
     "hnsw(faiss)": 1,
     "hnsw(nmslib)": 2,
     "hnswlib": 3,
-    "NGT-onng": 4,
+    "NGT-onng": 1,
     "SW-graph(nmslib)": 1,
     "annoy": 2,
     "faiss-ivf": 3,
-    "NGT-panng": 4,
+    "NGT-panng": 2,
     "mrpt": 1,
     "kgraph": 2,
     "flann": 3,
@@ -140,12 +140,12 @@ def get_color(algo, class_counter):
     else:
         hue = 0.0
         sat = 0.0
-        val = (0.2, 0.45, 0.7, 0.95)[class_counter[alg_class] % 4]
+        val = (0.1, 0.35, 0.6, 0.85)[class_counter[alg_class] % 4]
         class_counter[alg_class] += 1
-        return tuple(hsv_to_rgb((hue, sat, val))) + (0.66,)
+        return tuple(hsv_to_rgb((hue, sat, val))) + (0.8,)
 
-    sat = (0.3, 0.3, 0.3, 0.3)[class_counter[alg_class] % 4]
-    val = (0.5, 0.6166, 0.7333, 0.95)[class_counter[alg_class] % 4]
+    sat = (0.5, 0.4, 0.3, 0.2)[class_counter[alg_class] % 4]
+    val = (0.5, 0.6333, 0.7666, 0.9)[class_counter[alg_class] % 4]
     class_counter[alg_class] += 1
     return tuple(hsv_to_rgb((hue, sat, val))) + (0.8,)
 
@@ -157,7 +157,7 @@ def create_linestyles(unique_algorithms):
         colors[algo] = get_color(algo, class_counter)
     linestyles = dict((algo, '-')
                       for i, algo in enumerate(unique_algorithms))
-    markerstyles = dict((algo, '.')
+    markerstyles = dict((algo, ',')
                         for i, algo in enumerate(unique_algorithms))
     faded = dict((algo, (r, g, b, 0.3))
                  for algo, (r, g, b, a) in colors.items())
