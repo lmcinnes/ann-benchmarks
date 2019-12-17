@@ -15,7 +15,7 @@ from ann_benchmarks.results import (store_results, load_all_results,
 
 
 def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
-                batch):
+                batch, dataset):
     xm, ym = (metrics[xn], metrics[yn])
     # Now generate each plot
     handles = []
@@ -38,14 +38,15 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
         plt.gca().set_xscale('log')
     if y_log:
         plt.gca().set_yscale('log')
-    plt.gca().set_title(get_plot_label(xm, ym))
+    plt.gcf().suptitle(dataset, fontsize=24)
+    plt.gca().set_title(get_plot_label(xm, ym), fontsize=18)
     plt.gca().set_ylabel(ym['description'])
     plt.gca().set_xlabel(xm['description'])
     box = plt.gca().get_position()
     # plt.gca().set_position([box.x0, box.y0, box.width * 0.8, box.height])
     plt.gca().legend(handles, labels, loc='center left',
                      bbox_to_anchor=(1, 0.5), prop={'size': 9})
-    plt.grid(b=True, which='major', color='0.65', linestyle='-')
+#    plt.grid(b=True, which='major', color='0.65', linestyle='-')
     if 'lim' in xm:
         plt.xlim(xm['lim'])
     if 'lim' in ym:
@@ -122,4 +123,4 @@ if __name__ == "__main__":
 
     create_plot(runs, args.raw, args.x_log,
                 args.y_log, args.x_axis, args.y_axis, args.output,
-                linestyles, args.batch)
+                linestyles, args.batch, args.dataset)

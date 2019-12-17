@@ -3,6 +3,10 @@ from __future__ import absolute_import
 import itertools
 import numpy
 from ann_benchmarks.plotting.metrics import all_metrics as metrics
+from matplotlib.colors import hsv_to_rgb
+import seaborn as sns
+
+sns.set()
 
 
 def get_or_create_metrics(run):
@@ -91,7 +95,8 @@ def generate_n_colors(n):
     colors = [(.9, .4, .4, 1.)]
 
     def euclidean(a, b):
-        return sum((x - y)**2 for x, y in zip(a, b))
+        return sum((x - y) ** 2 for x, y in zip(a, b))
+
     while len(colors) < n:
         new_color = max(itertools.product(vs, vs, vs),
                         key=lambda a: min(euclidean(a, b) for b in colors))
@@ -99,12 +104,60 @@ def generate_n_colors(n):
     return colors
 
 
+algorithm_classes = {
+    "pynndescent": 0,
+    "hnsw(faiss)": 1,
+    "hnsw(nmslib)": 2,
+    "hnswlib": 3,
+    "NGT-onng": 4,
+    "SW-graph(nmslib)": 1,
+    "annoy": 2,
+    "faiss-ivf": 3,
+    "NGT-panng": 4,
+    "mrpt": 1,
+    "kgraph": 2,
+    "flann": 3,
+    "BallTree(nmslib)": 4,
+}
+
+
+def get_color(algo, class_counter):
+    if algo in algorithm_classes:
+        alg_class = algorithm_classes[algo]
+    else:
+        alg_class = 5
+
+    if alg_class == 0:
+        return (0.85, 0.02, 0.03, 0.9)
+    elif alg_class == 1:
+        hue = 0.7771
+    elif alg_class == 2:
+        hue = 0.6083
+    elif alg_class == 3:
+        hue = 0.275
+    elif alg_class == 4:
+        hue = 0.44375
+    else:
+        hue = 0.0
+        sat = 0.0
+        val = (0.2, 0.45, 0.7, 0.95)[class_counter[alg_class] % 4]
+        class_counter[alg_class] += 1
+        return tuple(hsv_to_rgb((hue, sat, val))) + (0.66,)
+
+    sat = (0.3, 0.3, 0.3, 0.3)[class_counter[alg_class] % 4]
+    val = (0.5, 0.6166, 0.7333, 0.95)[class_counter[alg_class] % 4]
+    class_counter[alg_class] += 1
+    return tuple(hsv_to_rgb((hue, sat, val))) + (0.8,)
+
+
 def create_linestyles(unique_algorithms):
-    colors = dict(
-        zip(unique_algorithms, generate_n_colors(len(unique_algorithms))))
-    linestyles = dict((algo, ['--', '-.', '-', ':'][i % 4])
+    class_counter = [0] * len(algorithm_classes)
+    colors = {}
+    for algo in unique_algorithms:
+        colors[algo] = get_color(algo, class_counter)
+    linestyles = dict((algo, '-')
                       for i, algo in enumerate(unique_algorithms))
-    markerstyles = dict((algo, ['+', '<', 'o', '*', 'x'][i % 5])
+    markerstyles = dict((algo, '.')
                         for i, algo in enumerate(unique_algorithms))
     faded = dict((algo, (r, g, b, 0.3))
                  for algo, (r, g, b, a) in colors.items())
