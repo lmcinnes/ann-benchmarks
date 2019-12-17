@@ -15,7 +15,7 @@ from ann_benchmarks.results import (store_results, load_all_results,
 
 
 def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
-                batch):
+                batch, dataset=None):
     xm, ym = (metrics[xn], metrics[yn])
     # Now generate each plot
     handles = []
@@ -23,7 +23,11 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
     plt.figure(figsize=(12, 9))
     for algo in sorted(all_data.keys(), key=lambda x: x.lower()):
         xs, ys, ls, axs, ays, als = create_pointset(all_data[algo], xn, yn)
-        color, faded, linestyle, marker = linestyles[algo]
+        try:
+            color, faded, linestyle, marker = linestyles[algo]
+        except KeyError:
+            print(linestyles)
+            raise ValueError("Bad linestyles")
         handle, = plt.plot(xs, ys, '-', label=algo, color=color,
                            ms=7, mew=3, lw=3, linestyle=linestyle,
                            marker=marker)
@@ -38,7 +42,10 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
         plt.gca().set_xscale('log')
     if y_log:
         plt.gca().set_yscale('log')
-    plt.gca().set_title(get_plot_label(xm, ym))
+    if dataset is not None:
+        plt.gca().set_title(dataset + ": " + get_plot_label(xm, ym))
+    else:
+        plt.gca().set_title(get_plot_label(xm, ym))
     plt.gca().set_ylabel(ym['description'])
     plt.gca().set_xlabel(xm['description'])
     box = plt.gca().get_position()
@@ -112,7 +119,7 @@ if __name__ == "__main__":
 
     dataset = get_dataset(args.dataset)
     count = int(args.count)
-    unique_algorithms = get_unique_algorithms()
+    unique_algorithms = get_unique_algorithms(dataset=args.dataset)
     results = load_all_results(args.dataset, count, True, args.batch)
     linestyles = create_linestyles(sorted(unique_algorithms))
     runs = compute_metrics(np.array(dataset["distances"]),
@@ -122,4 +129,4 @@ if __name__ == "__main__":
 
     create_plot(runs, args.raw, args.x_log,
                 args.y_log, args.x_axis, args.y_axis, args.output,
-                linestyles, args.batch)
+                linestyles, args.batch, dataset=args.dataset)

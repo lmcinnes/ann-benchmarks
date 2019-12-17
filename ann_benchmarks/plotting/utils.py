@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import itertools
 import numpy
 from ann_benchmarks.plotting.metrics import all_metrics as metrics
+from matplotlib.colors import hsv_to_rgb
 
 
 def get_or_create_metrics(run):
@@ -98,13 +99,57 @@ def generate_n_colors(n):
         colors.append(new_color + (1.,))
     return colors
 
+def color(algo, counter):
+    if algo == "pynndescent":
+        return (0.6, 0.0, 0.0, 0.95)
+    elif algo.startswith("pynn-"):
+        hue = 0.6083
+        if "pynn-" in counter:
+            sat = (0.2, 0.2, 0.1, 0.05, 0.2)[counter["pynn-"] % 5]
+            val = (0.5, 0.66, 0.9, 0.96, 0.33)[counter["pynn-"] % 5]
+            counter["pynn-"] += 1
+        else:
+            sat = 0.2
+            val = 0.5
+            counter["pynn-"] = 1
+        return tuple(hsv_to_rgb((hue, sat, val))) + (0.8,)
+    elif algo.startswith("pynnd-"):
+        hue = 0.7771
+        if "pynnd-" in counter:
+            sat = (0.2, 0.2, 0.1, 0.05, 0.2)[counter["pynnd-"] % 5]
+            val = (0.5, 0.66, 0.9, 0.96, 0.33)[counter["pynnd-"] % 5]
+            counter["pynnd-"] += 1
+        else:
+            sat = 0.2
+            val = 0.5
+            counter["pynnd-"] = 1
+        return tuple(hsv_to_rgb((hue, sat, val))) + (0.8,)
+    else:
+        hue = 0.275
+        if "other-" in counter:
+            sat = (0.2, 0.2, 0.1, 0.05, 0.2)[counter["other-"] % 5]
+            val = (0.5, 0.66, 0.9, 0.96, 0.33)[counter["other-"] % 5]
+            counter["other-"] += 1
+        else:
+            sat = 0.2
+            val = 0.5
+            counter["other-"] = 1
+        return tuple(hsv_to_rgb((hue, sat, val))) + (0.8,)
+
+
+
 
 def create_linestyles(unique_algorithms):
-    colors = dict(
-        zip(unique_algorithms, generate_n_colors(len(unique_algorithms))))
-    linestyles = dict((algo, ['--', '-.', '-', ':'][i % 4])
+    # colors = dict(
+    #     zip(unique_algorithms, generate_n_colors(len(unique_algorithms))))
+    print(unique_algorithms)
+    colors = {}
+    counter = {}
+    for algo in unique_algorithms:
+        colors[algo] = color(algo, counter)
+    linestyles = dict((algo, ['-', '-', '-', '-'][i % 4])
                       for i, algo in enumerate(unique_algorithms))
-    markerstyles = dict((algo, ['+', '<', 'o', '*', 'x'][i % 5])
+    markerstyles = dict((algo, [None, ','][i % 2])
                         for i, algo in enumerate(unique_algorithms))
     faded = dict((algo, (r, g, b, 0.3))
                  for algo, (r, g, b, a) in colors.items())
