@@ -13,6 +13,10 @@ from ann_benchmarks.plotting.utils import (get_plot_label, compute_metrics,
 from ann_benchmarks.results import (store_results, load_all_results,
                                     get_unique_algorithms, get_algorithm_name)
 
+from matplotlib import hsv_to_rgb
+
+
+color_sequence = []
 
 def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
                 batch, dataset):
