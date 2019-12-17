@@ -73,8 +73,8 @@ def load_all_results(dataset=None, count=None, split_batched=False,
                 pass
 
 
-def get_unique_algorithms():
+def get_unique_algorithms(dataset=None):
     algorithms = set()
-    for properties, _ in load_all_results():
+    for properties, _ in load_all_results(dataset=dataset):
         algorithms.add(properties['algo'])
     return algorithms

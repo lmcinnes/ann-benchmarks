@@ -13,30 +13,51 @@ from ann_benchmarks.plotting.utils import (get_plot_label, compute_metrics,
 from ann_benchmarks.results import (store_results, load_all_results,
                                     get_unique_algorithms, get_algorithm_name)
 
-from matplotlib import hsv_to_rgb
+from matplotlib.colors import hsv_to_rgb
 
-
-color_sequence = []
+hues = [0.6083, 0.7771, 0.275, 9416, 0.0]
+sats = [0.2, 0.15, 0.1]
+vals = [0.5, 0.66, 0.8]
+color_sequence = [tuple(hsv_to_rgb((h, sats[i] if h > 0 else 0.0, vals[i]))) + (0.8,)
+                  for h in hues for i in range(len(sats))]
 
 def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
-                batch, dataset):
+                batch, dataset, x_lims=None):
     xm, ym = (metrics[xn], metrics[yn])
     # Now generate each plot
     handles = []
     labels = []
     plt.figure(figsize=(12, 9))
+    color_counter = 0
     for algo in sorted(all_data.keys(), key=lambda x: x.lower()):
-        xs, ys, ls, axs, ays, als = create_pointset(all_data[algo], xn, yn)
-        color, faded, linestyle, marker = linestyles[algo]
+        if algo != "pynndescent":
+            xs, ys, ls, axs, ays, als = create_pointset(all_data[algo], xn, yn)
+            color, faded, linestyle, marker = linestyles[algo]
+
+            color = color_sequence[color_counter]
+            color_counter += 1
+
+            if len(xs) <= 2:
+                marker = '.'
+
+            handle, = plt.plot(xs, ys, '-', label=algo, color=color,
+                               ms=7, mew=3, lw=3, linestyle=linestyle,
+                               marker=marker)
+            handles.append(handle)
+            if raw:
+                handle2, = plt.plot(axs, ays, '-', label=algo, color=faded,
+                                    ms=5, mew=2, lw=2, linestyle=linestyle,
+                                    marker=marker)
+            labels.append(get_algorithm_name(algo, batch))
+
+    if "pynndescent" in all_data.keys():
+        xs, ys, ls, axs, ays, als = create_pointset(all_data["pynndescent"], xn, yn)
+        color = (0.6, 0.0, 0.0, 0.9)
         handle, = plt.plot(xs, ys, '-', label=algo, color=color,
                            ms=7, mew=3, lw=3, linestyle=linestyle,
                            marker=marker)
         handles.append(handle)
-        if raw:
-            handle2, = plt.plot(axs, ays, '-', label=algo, color=faded,
-                                ms=5, mew=2, lw=2, linestyle=linestyle,
-                                marker=marker)
-        labels.append(get_algorithm_name(algo, batch))
+        labels.append(get_algorithm_name("pynndescent", batch))
 
     if x_log:
         plt.gca().set_xscale('log')
@@ -51,10 +72,33 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
     plt.gca().legend(handles, labels, loc='center left',
                      bbox_to_anchor=(1, 0.5), prop={'size': 9})
 #    plt.grid(b=True, which='major', color='0.65', linestyle='-')
+
+    # Allow minor grid lines
+    plt.grid(b=True, which='major', color='w', linewidth=1.0)
+    plt.grid(b=True, which='minor', color='w', linewidth=0.5, alpha=0.66)
+
     if 'lim' in xm:
         plt.xlim(xm['lim'])
     if 'lim' in ym:
         plt.ylim(ym['lim'])
+
+    if x_lims is not None:
+        plt.xlim(x_lims)
+        ax = plt.gca()
+        data = np.vstack([line.get_xydata() for line in ax.lines])
+        sub_data = data[(data.T[0] > x_lims[0]) & (data.T[0] < x_lims[1])]
+        y_min = sub_data.T[1].min()
+        y_max = sub_data.T[1].max()
+        if y_log:
+            y_range = np.log10(y_max) - np.log10(y_min)
+            y_min = 10**(np.log10(y_min) - 0.1 * y_range)
+            y_max = 10**(np.log10(y_max) + 0.1 * y_range)
+        else:
+            y_range = y_max - y_min
+            y_min -= 0.1 * y_range
+            y_max += 0.1 * y_range
+        plt.ylim((y_min, y_max))
+        # plt.autoscale(axis='y')
     plt.savefig(fn_out, bbox_inches='tight')
     plt.close()
 
@@ -108,6 +152,16 @@ if __name__ == "__main__":
         '--recompute',
         help='Clears the cache and recomputes the metrics',
         action='store_true')
+    parser.add_argument(
+        '--x_lim_left',
+        type=float,
+        default=0.0,
+    )
+    parser.add_argument(
+        '--x_lim_right',
+        type=float,
+        default=1.05,
+    )
     args = parser.parse_args()
 
     if not args.output:
@@ -117,7 +171,7 @@ if __name__ == "__main__":
 
     dataset = get_dataset(args.dataset)
     count = int(args.count)
-    unique_algorithms = get_unique_algorithms()
+    unique_algorithms = get_unique_algorithms(args.dataset)
     results = load_all_results(args.dataset, count, True, args.batch)
     linestyles = create_linestyles(sorted(unique_algorithms))
     runs = compute_metrics(np.array(dataset["distances"]),
@@ -125,6 +179,7 @@ if __name__ == "__main__":
     if not runs:
         raise Exception('Nothing to plot')
 
+    x_lims = (args.x_lim_left, args.x_lim_right)
     create_plot(runs, args.raw, args.x_log,
                 args.y_log, args.x_axis, args.y_axis, args.output,
-                linestyles, args.batch, args.dataset)
+                linestyles, args.batch, args.dataset, x_lims=x_lims)
