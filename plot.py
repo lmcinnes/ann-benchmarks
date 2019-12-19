@@ -14,6 +14,8 @@ from ann_benchmarks.results import (store_results, load_all_results,
                                     get_unique_algorithms, get_algorithm_name)
 
 from matplotlib.colors import hsv_to_rgb
+from scipy.interpolate import make_interp_spline, BSpline
+from scipy.ndimage.filters import gaussian_filter1d
 
 hues = [0.6083, 0.7771, 0.275, 9416, 0.0]
 sats = [0.2, 0.15, 0.1]
@@ -37,12 +39,23 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
             color = color_sequence[color_counter]
             color_counter += 1
 
-            if len(xs) <= 2:
+            if len(xs) <= 3:
                 marker = '.'
+                new_xs = xs
+                new_ys = ys
+            else:
+                smooth = make_interp_spline(xs, ys, k=1)
+                new_xs = np.linspace(np.min(xs), np.max(xs), 1000)
+                new_ys = smooth(new_xs)
+                new_ys = gaussian_filter1d(new_ys, sigma=3)
 
-            handle, = plt.plot(xs, ys, '-', label=algo, color=color,
-                               ms=7, mew=3, lw=3, linestyle=linestyle,
-                               marker=marker)
+            handle, = plt.plot(
+                new_xs, new_ys,
+                # xs, ys,
+                '-', label=algo, color=color,
+                ms=7, mew=3, lw=3, linestyle=linestyle,
+                marker=marker
+            )
             handles.append(handle)
             if raw:
                 handle2, = plt.plot(axs, ays, '-', label=algo, color=faded,
@@ -53,9 +66,19 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
     if "pynndescent" in all_data.keys():
         xs, ys, ls, axs, ays, als = create_pointset(all_data["pynndescent"], xn, yn)
         color = (0.6, 0.0, 0.0, 0.9)
-        handle, = plt.plot(xs, ys, '-', label=algo, color=color,
-                           ms=7, mew=3, lw=3, linestyle=linestyle,
-                           marker=marker)
+
+        smooth = make_interp_spline(xs, ys, k=1)
+        new_xs = np.linspace(np.min(xs), np.max(xs), 1000)
+        new_ys = smooth(new_xs)
+        new_ys = gaussian_filter1d(new_ys, sigma=3)
+
+        handle, = plt.plot(
+            new_xs, new_ys,
+            # xs, ys,
+            '-', label=algo, color=color,
+            ms=7, mew=3, lw=3, linestyle=linestyle,
+            marker=marker
+        )
         handles.append(handle)
         labels.append(get_algorithm_name("pynndescent", batch))
 
