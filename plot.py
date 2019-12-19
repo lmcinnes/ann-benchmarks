@@ -24,7 +24,7 @@ color_sequence = [tuple(hsv_to_rgb((h, sats[i] if h > 0 else 0.0, vals[i]))) + (
                   for h in hues for i in range(len(sats))]
 
 def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
-                batch, dataset, x_lims=None):
+                batch, dataset, x_lims=None, smooth=False):
     xm, ym = (metrics[xn], metrics[yn])
     # Now generate each plot
     handles = []
@@ -43,11 +43,14 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
                 marker = '.'
                 new_xs = xs
                 new_ys = ys
-            else:
+            elif smooth:
                 smooth = make_interp_spline(xs, ys, k=1)
                 new_xs = np.linspace(np.min(xs), np.max(xs), 1000)
                 new_ys = smooth(new_xs)
                 new_ys = gaussian_filter1d(new_ys, sigma=3)
+            else:
+                new_xs = xs
+                new_ys = ys
 
             handle, = plt.plot(
                 new_xs, new_ys,
@@ -67,10 +70,14 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
         xs, ys, ls, axs, ays, als = create_pointset(all_data["pynndescent"], xn, yn)
         color = (0.6, 0.0, 0.0, 0.9)
 
-        smooth = make_interp_spline(xs, ys, k=1)
-        new_xs = np.linspace(np.min(xs), np.max(xs), 1000)
-        new_ys = smooth(new_xs)
-        new_ys = gaussian_filter1d(new_ys, sigma=3)
+        if smooth:
+            smooth = make_interp_spline(xs, ys, k=1)
+            new_xs = np.linspace(np.min(xs), np.max(xs), 1000)
+            new_ys = smooth(new_xs)
+            new_ys = gaussian_filter1d(new_ys, sigma=3)
+        else:
+            new_xs = xs
+            new_ys = ys
 
         handle, = plt.plot(
             new_xs, new_ys,
