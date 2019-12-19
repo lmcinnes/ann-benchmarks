@@ -24,7 +24,7 @@ color_sequence = [tuple(hsv_to_rgb((h, sats[i] if h > 0 else 0.0, vals[i]))) + (
                   for h in hues for i in range(len(sats))]
 
 def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
-                batch, dataset, x_lims=None, smooth=False):
+                batch, dataset, x_lims=None, smooth=True):
     xm, ym = (metrics[xn], metrics[yn])
     # Now generate each plot
     handles = []
@@ -39,7 +39,14 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
             color = color_sequence[color_counter]
             color_counter += 1
 
-            if len(xs) <= 3:
+            if x_lims is not None:
+                xs = np.array(xs)
+                mask = ((xs > x_lims[0] - 0.01 * x_lims[0]) &
+                        (xs < x_lims[1] + 0.01 * x_lims[1]))
+                xs = xs[mask]
+                ys = np.array(ys)[mask]
+
+            if len(xs) <= 2:
                 marker = '.'
                 new_xs = xs
                 new_ys = ys
@@ -69,6 +76,14 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
     if "pynndescent" in all_data.keys():
         xs, ys, ls, axs, ays, als = create_pointset(all_data["pynndescent"], xn, yn)
         color = (0.6, 0.0, 0.0, 0.9)
+        marker = ','
+
+        if x_lims is not None:
+            xs = np.array(xs)
+            mask = ((xs > x_lims[0] - 0.01 * x_lims[0]) &
+                    (xs < x_lims[1] + 0.01 * x_lims[1]))
+            xs = xs[mask]
+            ys = np.array(ys)[mask]
 
         if smooth:
             smooth = make_interp_spline(xs, ys, k=1)
@@ -192,6 +207,10 @@ if __name__ == "__main__":
         type=float,
         default=1.05,
     )
+    parser.add_argument(
+        '--smooth',
+        help='Apply a little smoothing to the lines',
+        action='store_true')
     args = parser.parse_args()
 
     if not args.output:
@@ -212,4 +231,4 @@ if __name__ == "__main__":
     x_lims = (args.x_lim_left, args.x_lim_right)
     create_plot(runs, args.raw, args.x_log,
                 args.y_log, args.x_axis, args.y_axis, args.output,
-                linestyles, args.batch, args.dataset, x_lims=x_lims)
+                linestyles, args.batch, args.dataset, x_lims=x_lims, smooth=args.smooth)
