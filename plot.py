@@ -39,7 +39,7 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
             color = color_sequence[color_counter]
             color_counter += 1
 
-            if x_lims is not None:
+            if x_lims is not None and smooth:
                 xs = np.array(xs)
                 mask = ((xs > x_lims[0] - 0.01 * x_lims[0]) &
                         (xs < x_lims[1] + 0.01 * x_lims[1]))
@@ -78,7 +78,7 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
         color = (0.6, 0.0, 0.0, 0.9)
         marker = ','
 
-        if x_lims is not None:
+        if x_lims is not None and smooth:
             xs = np.array(xs)
             mask = ((xs > x_lims[0] - 0.01 * x_lims[0]) &
                     (xs < x_lims[1] + 0.01 * x_lims[1]))
