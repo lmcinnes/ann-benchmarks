@@ -17,11 +17,15 @@ from matplotlib.colors import hsv_to_rgb
 from scipy.interpolate import make_interp_spline, BSpline
 from scipy.ndimage.filters import gaussian_filter1d
 
+import seaborn as sns
+
 hues = [0.6083, 0.7771, 0.275, 9416, 0.0]
-sats = [0.2, 0.15, 0.1]
-vals = [0.5, 0.66, 0.8]
-color_sequence = [tuple(hsv_to_rgb((h, sats[i] if h > 0 else 0.0, vals[i]))) + (0.8,)
-                  for h in hues for i in range(len(sats))]
+sats = [0.2,] # [0.2, 0.15, 0.1]
+vals = [0.8,] # [0.5, 0.66, 0.8]
+# color_sequence = [tuple(hsv_to_rgb((h, sats[i] if h > 0 else 0.0, vals[i]))) + (0.8,)
+#                   for h in hues for i in range(len(sats))]
+color_sequence = sns.color_palette('YlGnBu', 5, desat=0.4)
+# color_sequence = sns.hls_palette(4, l=0.8, s=0.3)
 
 def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
                 batch, dataset, x_lims=None, smooth=True):
