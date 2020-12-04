@@ -104,20 +104,35 @@ def generate_n_colors(n):
     return colors
 
 
+# algorithm_classes = {
+#     "pynndescent": 0,
+#     "hnsw(faiss)": 1,
+#     "hnsw(nmslib)": 2,
+#     "hnswlib": 3,
+#     "NGT-onng": 1,
+#     "SW-graph(nmslib)": 1,
+#     "annoy": 2,
+#     "faiss-ivf": 3,
+#     "NGT-panng": 2,
+#     "mrpt": 1,
+#     "kgraph": 2,
+#     "flann": 3,
+#     "BallTree(nmslib)": 4,
+# }
 algorithm_classes = {
     "pynndescent": 0,
-    "hnsw(faiss)": 1,
+    "hnsw(faiss)": 2,
     "hnsw(nmslib)": 2,
-    "hnswlib": 3,
-    "NGT-onng": 1,
+    "hnswlib": 2,
+    "NGT-onng": 3,
     "SW-graph(nmslib)": 1,
-    "annoy": 2,
-    "faiss-ivf": 3,
-    "NGT-panng": 2,
-    "mrpt": 1,
+    "annoy": 1,
+    "faiss-ivf": 1,
+    "NGT-panng": 3,
+    "mrpt": 3,
     "kgraph": 2,
-    "flann": 3,
-    "BallTree(nmslib)": 4,
+    "flann": 1,
+    "BallTree(nmslib)": 1,
 }
 
 
@@ -153,7 +168,7 @@ def get_color(algo, class_counter):
 def create_linestyles(unique_algorithms):
     class_counter = [0] * len(algorithm_classes)
     colors = {}
-    for algo in unique_algorithms:
+    for algo in sorted(unique_algorithms):
         colors[algo] = get_color(algo, class_counter)
     linestyles = dict((algo, '-')
                       for i, algo in enumerate(unique_algorithms))

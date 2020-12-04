@@ -75,7 +75,7 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
 
     if "pynndescent" in all_data.keys():
         xs, ys, ls, axs, ays, als = create_pointset(all_data["pynndescent"], xn, yn)
-        color = (0.6, 0.0, 0.0, 0.9)
+        color = (0.75, 0.0, 0.0, 0.9)
         marker = ','
 
         if x_lims is not None and smooth:
@@ -97,9 +97,9 @@ def create_plot(all_data, raw, x_log, y_log, xn, yn, fn_out, linestyles,
         handle, = plt.plot(
             new_xs, new_ys,
             # xs, ys,
-            '-', label=algo, color=color,
-            ms=7, mew=3, lw=3, linestyle=linestyle,
-            marker=marker
+            '-', label="pynndescent", color=color,
+            ms=7, mew=3, lw=3, linestyle='-',
+            marker=','
         )
         handles.append(handle)
         labels.append(get_algorithm_name("pynndescent", batch))
@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
     dataset = get_dataset(args.dataset)
     count = int(args.count)
-    unique_algorithms = get_unique_algorithms(args.dataset)
+    unique_algorithms = get_unique_algorithms()
     results = load_all_results(args.dataset, count, True, args.batch)
     linestyles = create_linestyles(sorted(unique_algorithms))
     runs = compute_metrics(np.array(dataset["distances"]),
